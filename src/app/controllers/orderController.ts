@@ -4,7 +4,7 @@ import { ProductModel } from "../models/Product.ts";
 
 const orderBike = async (req: Request, res: Response) => {
   try {
-    const { email, product: productId, quantity } = req.body;
+    const { email, product: productId, quantity, totalPrice: providedTotalPrice } = req.body;
 
     const product = await ProductModel.findById(productId);
 
@@ -24,7 +24,7 @@ const orderBike = async (req: Request, res: Response) => {
       return;
     }
 
-    const totalPrice = product.price * quantity;
+    const totalPrice = providedTotalPrice || product.price * quantity;
 
     const order = await OrderModel.create({
       email,
@@ -52,8 +52,8 @@ const orderBike = async (req: Request, res: Response) => {
         success: false,
         error: {
           message: error.message,
-          stack: error.stack,
         },
+        stack: error.stack,
       });
     } else {
       res.status(500).json({
@@ -92,8 +92,8 @@ const calculateRevenue = async (req: Request, res: Response) => {
         success: false,
         error: {
           message: error.message,
-          stack: error.stack,
         },
+        stack: error.stack,
       });
     }
   }

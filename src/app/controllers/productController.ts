@@ -10,11 +10,22 @@ const createProduct = async (req: Request, res: Response) => {
       data: product,
     });
   } catch (error) {
-    res.status(400).json({
-      message: "Failed to create product",
-      success: false,
-      error,
-    });
+    if (error instanceof Error) {
+      res.status(500).json({
+        message: "Failed upload bikes",
+        success: false,
+        error: {
+          message: "Unknown error occurred",
+        },
+        stack: error.stack,
+      });
+    } else {
+      res.status(400).json({
+        message: "Failed to create product",
+        success: false,
+        error,
+      });
+    }
   }
 };
 
@@ -33,7 +44,7 @@ const getAllBikes = async (req: Request, res: Response) => {
         ],
       });
     } else {
-      
+
       products = await ProductModel.find();
 
     }
@@ -50,8 +61,8 @@ const getAllBikes = async (req: Request, res: Response) => {
         success: false,
         error: {
           message: error.message,
-          stack: error.stack,
         },
+        stack: error.stack,
       });
     } else {
       res.status(500).json({
@@ -73,8 +84,8 @@ const getProductById = async (req: Request, res: Response) => {
     const id = req.params.productId;
     const product = await ProductModel.findById(id);
     console.log(product);
-    
-    if(!product){
+
+    if (!product) {
       res.status(200).json({
         message: "No matching bike found",
         success: true,
@@ -87,7 +98,7 @@ const getProductById = async (req: Request, res: Response) => {
       success: true,
       data: product,
     });
-    
+
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).json({
@@ -95,10 +106,10 @@ const getProductById = async (req: Request, res: Response) => {
         success: false,
         error: {
           message: error.message,
-          stack: error.stack,
         },
+        stack: error.stack,
       });
-    }else {
+    } else {
       res.status(500).json({
         message: "Failed to create order",
         success: false,
@@ -117,10 +128,7 @@ const updateProduct = async (req: Request, res: Response) => {
       new: true,
       runValidators: true,
     });
-
-    console.log(updatedProduct);
     
-
     res.status(200).json({
       message: "Bike updated successfully",
       success: true,
@@ -136,7 +144,7 @@ const updateProduct = async (req: Request, res: Response) => {
           stack: error.stack,
         },
       });
-    }else {
+    } else {
       res.status(500).json({
         message: "Failed to create order",
         success: false,
@@ -154,7 +162,7 @@ const deleteProduct = async (req: Request, res: Response) => {
     const deletedProduct = await ProductModel.findByIdAndDelete(id);
 
     if (!deletedProduct) {
-       res.status(404).json({
+      res.status(404).json({
         message: "Product not found",
         success: false,
       });
